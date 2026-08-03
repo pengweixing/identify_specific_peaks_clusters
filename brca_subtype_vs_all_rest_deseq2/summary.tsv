@@ -1,0 +1,5 @@
+target_group	target_samples	rest_samples	specific_regions
+Basal	15	390	3968
+Her2	11	394	5696
+LumA	18	387	3808
+LumB	26	379	4712
