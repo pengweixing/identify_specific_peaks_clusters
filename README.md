@@ -1,9 +1,25 @@
-# Basal-specific peak clusters and 50 kb IGV plots
+# Basal-specific peak clusters (One Example)
 
 This directory contains the complete workflow for identifying BRCA
 subtype-specific regions from the updated pan-cancer peak set, clustering all
 Basal-specific regions, ranking the clusters, and drawing the top 20 IGV-like
-figures. 
+figures.
+
+## Download this repository
+
+This repository uses Git LFS for `data_m.txt.gz`. Install Git and Git LFS first,
+then clone the repository and download the LFS object:
+
+```bash
+git lfs install
+git clone https://github.com/pengweixing/identify_specific_peaks_clusters.git
+cd identify_specific_peaks_clusters
+git lfs pull
+```
+
+After `git lfs pull`, `data_m.txt.gz` should be approximately 408 MB. If it is
+only a small text pointer, Git LFS was not installed or the LFS download did not
+finish; install Git LFS and run `git lfs pull` again.
 
 ## Run from beginning to end
 
@@ -12,7 +28,6 @@ Decompress both before the first workflow run while keeping the compressed
 archives:
 
 ```bash
-cd /home/pengwei/Desktop/Projects/08.cancer_specific_sites/identify_specific_peaks_clusters
 gzip -dk data_m.txt.gz
 gzip -dk hg38.refGene.gtf.gz
 ```
