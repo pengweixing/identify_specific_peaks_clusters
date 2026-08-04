@@ -1,8 +1,7 @@
 # Basal-specific peak clusters (One Example)
 
-This directory contains the complete workflow for identifying BRCA
-subtype-specific regions from the updated pan-cancer peak set, clustering all
-Basal-specific regions, ranking the clusters, and drawing the top 20 IGV-like
+This directory contains the complete workflow for identifying cancer-specific regions from the pan-cancer peak set, clustering all
+specific regions, ranking the clusters, and drawing the top IGV-like
 figures.
 
 ## Download this repository
@@ -47,20 +46,13 @@ The script follows one fixed path:
 3. Calculate cancer-type CPM means and variances for cluster scoring.
 4. Run DESeq2 for Basal, Her2, LumA, and LumB versus all other BRCA subtypes
    (`FDR <= 0.05`, `log2FC >= 1`, and `min CPM >= 1`).
-5. Convert every row of `Basal_specific_regions.tsv` to BED. There is no
-   narrowPeak occurrence-counting or 15/15 selection step.
+5. Convert every row of `Basal_specific_regions.tsv` to BED. 
 6. Join consecutive Basal-specific peaks separated by at most 5 kb and retain
    clusters containing at least three peaks.
 7. Rank clusters using structural score, mean log2 fold change, FDR, mean CPM,
    and CPM stability.
 8. Plot the top 20 clusters with 50 kb flanks.
 
-The completed run using the updated peak BED produced 3,968 Basal-specific
-regions and 103 distance clusters. The top 20 ranked clusters contain 127 peaks
-and correspond to the 20 PNG files in `Basal_specific_cluster_igv_plots_50kb/`.
-
-DESeq2 identified 3,968 Basal-, 5,696 Her2-, 3,808 LumA-, and 4,712
-LumB-specific regions with the cutoffs above.
 
 ## Main inputs and scripts
 
@@ -69,7 +61,7 @@ LumB-specific regions with the cutoffs above.
 - `hg38.refGene.gtf.gz`: compressed hg38 RefGene annotation. Run
   `gzip -dk hg38.refGene.gtf.gz` to create the plotting input
   `hg38.refGene.gtf`.
-- `Pancancer_peak.specific.bed`: updated input peak set.
+- `Pancancer_peak.specific.bed`: input peak set by excluding all healthy peaks.
 - `sample_cancer_groups.tsv`: sample-to-cancer/subtype assignments.
 - `filter_data_m_by_pancancer_peaks.py`: extract specific-region matrix rows.
 - `merge_replicates_by_mean.py`: merge technical replicates.
@@ -81,6 +73,8 @@ LumB-specific regions with the cutoffs above.
 - `rank_basal_specific_clusters.py`: rank the resulting clusters.
 - `plot_basal_specific_cluster_igv.py`: generate IGV-like plots, including its
   own bigWig-reading and gene-annotation helper functions.
+
+- `healthy.peak.bed`: derived from DOI: 10.1016/j.cell.2021.10.024
 
 ## External bigWig inputs (not included)
 
