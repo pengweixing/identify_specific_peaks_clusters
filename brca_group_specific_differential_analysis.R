@@ -9,6 +9,7 @@ option_list <- list(
   matrix = "data_m.Pancancer_peak.specific.mean_replicates.txt",
   groups = "sample_cancer_groups.tsv",
   outdir = "brca_subtype_vs_all_rest_deseq2",
+  target_groups = "Basal,Her2,LumA,LumB",
   fdr = 0.05,
   logfc = 1,
   min_cpm = 1
@@ -38,7 +39,17 @@ fdr_cutoff <- option_list$fdr
 logfc_cutoff <- option_list$logfc
 min_cpm <- option_list$min_cpm
 
-target_groups <- c("Basal", "Her2", "LumA", "LumB")
+target_groups <- trimws(strsplit(option_list$target_groups, ",", fixed = TRUE)[[1]])
+if (length(target_groups) == 0 || any(!nzchar(target_groups))) {
+  stop(
+    "--target_groups must be a comma-separated list, e.g. Basal,Her2,LumA,LumB",
+    call. = FALSE
+  )
+}
+if (anyDuplicated(target_groups)) {
+  stop("--target_groups contains duplicate group names.", call. = FALSE)
+}
+
 dir.create(outdir, showWarnings = FALSE, recursive = TRUE)
 dir.create(file.path(outdir, "target_vs_rest"), showWarnings = FALSE, recursive = TRUE)
 
@@ -73,7 +84,7 @@ target_counts <- group_counts[target_groups]
 target_counts[is.na(target_counts)] <- 0
 if (any(target_counts == 0)) {
   stop(
-    "All four BRCA groups must have at least one sample. Counts: ",
+    "All target groups must have at least one sample. Counts: ",
     paste(target_groups, as.integer(target_counts), sep = "=", collapse = ", "),
     call. = FALSE
   )
@@ -81,6 +92,7 @@ if (any(target_counts == 0)) {
 
 message("Samples used by group:")
 message(paste(names(group_counts), as.integer(group_counts), sep = "=", collapse = ", "))
+message("Target groups: ", paste(target_groups, collapse = ", "))
 fwrite(sample_groups, file.path(outdir, "samples_used.tsv"), sep = "\t")
 
 counts <- as.matrix(mat_dt[, ..sample_cols])
@@ -115,10 +127,13 @@ size_dds <- estimateSizeFactors(size_dds)
 norm_counts <- counts(size_dds, normalized = TRUE)
 log_norm_counts <- log2(norm_counts + 1)
 
-target_means <- sapply(target_groups, function(group) {
+target_means <- vapply(target_groups, function(group) {
   rowMeans(log_norm_counts[, sample_groups$cancer_group == group, drop = FALSE])
-})
-target_means_dt <- data.table(peak_id = peak_ids, target_means)
+}, numeric(length(peak_ids)))
+target_means_dt <- cbind(
+  data.table(peak_id = peak_ids),
+  as.data.table(target_means)
+)
 setnames(target_means_dt, target_groups, paste0("mean_log2normcount_", target_groups))
 fwrite(
   target_means_dt,

@@ -20,6 +20,33 @@ After `git lfs pull`, `data_m.txt.gz` should be approximately 408 MB. If it is
 only a small text pointer, Git LFS was not installed or the LFS download did not
 finish; install Git LFS and run `git lfs pull` again.
 
+## Install Python and R packages
+
+The Python scripts require `matplotlib`, `numpy`, `pandas`, and `pyBigWig`.
+Create a virtual environment and install all Python dependencies from the
+included requirements file:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python3 -m pip install --upgrade pip
+python3 -m pip install -r requirements.txt
+```
+
+The differential analysis requires the R packages `data.table` and `DESeq2`.
+Install `data.table` from CRAN and `DESeq2` from Bioconductor:
+
+```bash
+Rscript -e 'install.packages(c("BiocManager", "data.table"), repos="https://cloud.r-project.org")'
+Rscript -e 'BiocManager::install("DESeq2", ask=FALSE, update=FALSE)'
+```
+
+Install these R packages with the same `Rscript` executable used by
+`run_basal_specific_peak_clusters.sh`. If necessary, update the script's
+`rscript` variable to point to that executable. Activate the Python virtual
+environment before running the workflow so its `python3` commands use the
+installed packages.
+
 ## Run from beginning to end
 
 The full count matrix and hg38 gene annotation are stored as gzip archives.
